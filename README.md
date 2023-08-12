@@ -1,5 +1,6 @@
 # vLuau
-vLuau is a Luau VM with compiler which can be ran in Roblox.
+vLuau is a Luau VM with compiler which can be ran in Roblox.<br>
+Like vLua but with Fully Luau Support.
 ## Credits
 - [vLuau](https://github.com/kosuke14/vLuau) - [me (sussy person / sukru / kosuke14 / reboy)](https://github.com/kosuke14)
 - [Fiu](https://github.com/TheGreatSageEqualToHeaven/Fiu) (Luau v3 Bytecode Interpreter) - [TheGreatSageEqualToHeaven](https://github.com/TheGreatSageEqualToHeaven) and [Rerumu](https://github.com/Rerumu)
