@@ -1,2 +1,2 @@
 # vLuau
-Luau VM with compiler can be ran in Luau.
+Luau VM with compiler can be ran in Roblox.
