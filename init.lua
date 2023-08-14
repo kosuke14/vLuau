@@ -5,6 +5,8 @@
 	vLuau is a Luau virtual machine written in Luau.
 
 	Update:
+		8 14, 2023:
+			- Updated Luau to 0.590 (LuauInLuau Custom Build).
 		8 12, 2023:
 			- Set FIU_DEBUGGING to false in Fiu.
 			- Add COVERAGE Opcode handling in Fiu.
