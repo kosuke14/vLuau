@@ -70,6 +70,15 @@ return setmetatable({
 		end
 		return luau_load(luau_compile(source, chunkname), env or getfenv(2))
 	end,
+	create_env = function(envwriter)
+			local fenv = getfenv(2)
+			local env = setmetatable({}, {
+				__index = function(self,k)
+					return envwriter[k] or fenv[k]
+				end,
+			})
+			return env
+		end,
 }, {
 	__call = function(self, source, env, chunkname)
 		return self.luau_execute(source, env or getfenv(2), chunkname)
