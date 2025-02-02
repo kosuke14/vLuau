@@ -1,10 +1,13 @@
 --[[
-	vLuau - Similar to vLua but has Fully Luau Support (developed by sus, uploaded with newdever411)
+	vLuau - Similar to vLua but has Fully Luau Support (by sus - GH: kosuke14)
 
 	Luau (lowercase u) is a Custom Lua Language which is developed by Roblox. (similar to Lua 5.1)
 	vLuau is a Luau virtual machine written in Luau.
 
 	Update:
+		2 02, 2025:
+			- Updated Luau to 0.654
+			- Using LuauCeption instead of LuauInLuau because of deprecation
 		8 14, 2023:
 			- Updated Luau to 0.590 (LuauInLuau Custom Build).
 		8 12, 2023:
@@ -18,7 +21,7 @@
 		8 10, 2023: initial release
 
 	WARNING to use vLuau:
-		A source of LuauInLuau is pretty BIG, opening it could CRASH your studio.
+		A source of LuauCeption is pretty BIG, opening it could CRASH your studio.
 	
 	Usage:
 		local loadstring = require(path.to.MainModule) -- requiring vLuau MainModule
@@ -41,24 +44,40 @@
 		-- (ERROR) syntaxTest:1: Incomplete statement: expected assignment or a function call
 
 	Credits:
-		github:RealEthanPlayzDev/LuauInLuau  (Translated fully compiled Luau source to Luau)
+		github:RadiatedExodus/LuauCeption    (   Translated compiled Luau source to Luau   )
 		github:TheGreatSageEqualToHeaven/Fiu (  Luau Bytecode Interpreter written in Luau  )
 --]]
 
 local Loader = require(script:WaitForChild("Fiu"))
-local Compiler = require(script:WaitForChild("LuauInLuau"))
+local Ception = require(script:WaitForChild("Ception"))
 
 local function ValidLuauBytecode(bytecode)
-	return string.unpack(">B", bytecode, 1) == 3
+	if bytecode:len(bytecode) == 0 then
+		return false
+	end
+	
+	local bc = if typeof(bytecode) == 'string' then buffer.fromstring(bytecode) else bytecode
+	local luauVersion = buffer.readu8(bc, 0)
+	if luauVersion == 0 then
+		--error("the provided bytecode is an error message",0)
+		return false
+	elseif luauVersion < 3 or luauVersion > 6 then
+		--error("the version of the provided bytecode is unsupported",0)
+		return false
+	elseif luauVersion >= 4 then
+		return true
+	end
+	
+	return true
 end
 function luau_compile(source, chunkname)
-	local suc, bytecode = Compiler.Compile(source)
-	return suc == true and bytecode or error((chunkname or '@') .. bytecode:sub(2), 0) -- stack level is 0 to make debugging easier
+	local bytecode, _ = Ception.luau_compile(source)
+	return bytecode:sub(1, 1) ~= "\0" and bytecode or error((chunkname or '@') .. bytecode:sub(2), 0) -- stack level is 0 to make debugging easier
 end
 function luau_load(bytecode, env)
-	assert(ValidLuauBytecode(bytecode), "luau_load: Argument #1 got invalid bytecode (v3 bytecode expected)")
+	assert(ValidLuauBytecode(bytecode), "luau_load: Argument #1 got invalid bytecode")
 	assert(type(env) == 'table' or env == nil, ("luau_load: Argument #2 got '%s' (table expected)"):format(typeof(env)))
-	return Loader.luau_load(bytecode, env or getfenv(2))
+	return Loader.luau_load(bytecode, env or getfenv(debug.info(2, 'f')))
 end
 
 return setmetatable({
@@ -68,19 +87,20 @@ return setmetatable({
 		if ValidLuauBytecode(source) then
 			return luau_load(source, env)
 		end
-		return luau_load(luau_compile(source, chunkname), env or getfenv(2))
+		return luau_load(luau_compile(source, chunkname), env or getfenv(debug.info(2, 'f')))
 	end,
 	create_env = function(envwriter)
-			local fenv = getfenv(2)
-			local env = setmetatable({}, {
-				__index = function(self,k)
-					return envwriter[k] or fenv[k]
-				end,
-			})
-			return env
-		end,
+		local fenv = getfenv(debug.info(2, 'f'))
+		local env = setmetatable({}, {
+			__index = function(self,k)
+				return envwriter[k] or fenv[k]
+			end,
+		})
+		return env
+	end,
 }, {
 	__call = function(self, source, env, chunkname)
-		return self.luau_execute(source, env or getfenv(2), chunkname)
+		return self.luau_execute(source, env or getfenv(debug.info(2, 'f')), chunkname)
 	end,
 })
+
