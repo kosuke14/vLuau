@@ -27,7 +27,7 @@ loadstring("print('hello world!')", getfenv(0))()
 loadstring("a", nil, 'syntaxTest')()
 -- (ERROR) syntaxTest:1: Incomplete statement: expected assignment or a function call
 ```
-Roblox Model is available at [vLuau (lowercase u)](https://www.roblox.com/library/14382140693) - DELETED
+Roblox Model is available at [here](https://create.roblox.com/store/asset/108059886578663) (trolled rblx fr)
 ## Building
 1. Go [LuauCeption](https://github.com/RadiatedExodus/LuauCeption) and build them as compiler with latest Luau
 2. Replace Ception.luau with the built version.
