@@ -1,51 +1,17 @@
 --[[
-	vLuau - Similar to vLua but has Fully Luau Support (by sus - GH: kosuke14)
-
-	Luau (lowercase u) is a Custom Lua Language which is developed by Roblox. (similar to Lua 5.1)
+	vLuau - Similar to vLua but has Fully Luau Support (by gh:kosuke14)
 	vLuau is a Luau virtual machine written in Luau.
 
-	Update:
-		2 02, 2025:
-			- Updated Luau to 0.654
-			- Using LuauCeption instead of LuauInLuau because of deprecation
-		8 14, 2023:
-			- Updated Luau to 0.590 (LuauInLuau Custom Build).
-		8 12, 2023:
-			- Set FIU_DEBUGGING to false in Fiu.
-			- Add COVERAGE Opcode handling in Fiu.
-			* another update at same day:
-			- Set default environment stack level to 2.
-			- Fixed luau_load function.
-			- Fixed Compile Error containing 'end of file'.
-			- More strict checks.
-		8 10, 2023: initial release
-
-	WARNING to use vLuau:
-		A source of LuauCeption is pretty BIG, opening it could CRASH your studio.
-	
-	Usage:
-		local loadstring = require(path.to.MainModule) -- requiring vLuau MainModule
-		
-		loadstring(<string:(source or bytecode)>[, table:env, string:chunkname]): function
-		-- compile code and build function
-		loadstring.luau_execute(...)
-		-- same as above
-		
-		loadstring.luau_compile(<string:source>[, string:chunkname]): string
-		-- compile code and return bytecode
-		
-		loadstring.luau_load(<string:bytecode>[, table:env]): function
-		-- build function with provided compiled bytecode
-		
-		-- Examples:
-		loadstring("print('hello world!')", getfenv(0))()
-		-- (OUTPUT) hello world!
-		loadstring("a", nil, 'syntaxTest')()
-		-- (ERROR) syntaxTest:1: Incomplete statement: expected assignment or a function call
+	Example:
+	local load = require(workspace.vLuau)
+	local success, compileError = pcall(function()
+		local loaded = load("print('hello from vLuau!')")
+		loaded() -- hello from vLuau!
+	end)
 
 	Credits:
-		github:RadiatedExodus/LuauCeption    (   Translated compiled Luau source to Luau   )
-		github:TheGreatSageEqualToHeaven/Fiu (  Luau Bytecode Interpreter written in Luau  )
+		gh:RadiatedExodus/LuauCeption    (   Translated compiled Luau source to Luau   )
+		gh:TheGreatSageEqualToHeaven/Fiu (  Luau Bytecode Interpreter written in Luau  )
 --]]
 
 local Loader = require(script:WaitForChild("Fiu"))
