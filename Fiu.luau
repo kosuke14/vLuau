@@ -1,3 +1,5 @@
+--!optimize 2
+--!native
 -- // Environment changes in the VM are not supposed to alter the behaviour of the VM so we localise globals beforehand
 local type = type
 local pcall = pcall
@@ -185,7 +187,7 @@ end
 local function getmaxline(module, protoid)
 	local proto = if (protoid == nil) then module.mainProto else module.protoList[protoid]
 	local size = -1
-	
+
 	assert(proto.lineinfoenabled, "proto must have debug enabled")
 
 	for pc = 1, proto.sizecode do
@@ -327,8 +329,8 @@ local function luau_deserialize(bytecode, luau_settings)
 	end
 
 	local function readInstruction(codeList)
-		local value = luau_settings.decodeOp(readWord())
-		local opcode = bit32_band(value, 0xFF)
+		local value = readWord()
+		local opcode = bit32_band(luau_settings.decodeOp(value), 0xFF)
 
 		local opinfo = opList[opcode + 1]
 		local opname = opinfo[1]
@@ -444,7 +446,7 @@ local function luau_deserialize(bytecode, luau_settings)
 
 			skipnext = readInstruction(codelist)
 		end
-		
+
 		local debugcodelist = table_create(sizecode) 
 		for i = 1, sizecode do 
 			debugcodelist[i] = codelist[i].opcode
@@ -583,7 +585,7 @@ local function luau_deserialize(bytecode, luau_settings)
 			bytecodeid = bytecodeid;
 		}
 	end
-	
+
 	-- userdataRemapping (not used in VM, left unused)
 	if typesVersion == 3 then
 		local index = readByte()
@@ -646,7 +648,7 @@ local function luau_load(module, env, luau_settings)
 	local function luau_wrapclosure(module, proto, upvals)
 		local function luau_execute(...)
 			local debugging, stack, protos, code, varargs
-			
+
 			if luau_settings.errorHandling then
 				debugging, stack, protos, code, varargs = ... 
 			else 
@@ -657,18 +659,18 @@ local function luau_load(module, env, luau_settings)
 					len = 0,
 					list = {},
 				}
-	
+
 				table_move(passed, 1, proto.numparams, 0, stack)
-	
+
 				if proto.numparams < passed.n then
 					local start = proto.numparams + 1
 					local len = passed.n - proto.numparams
 					varargs.len = len
 					table_move(passed, start, start + len - 1, 1, varargs.list)
 				end
-	
+
 				passed = nil
-	
+
 				debugging = {pc = 0, name = "NONE"}
 
 				protos = proto.protos 
@@ -705,12 +707,12 @@ local function luau_load(module, env, luau_settings)
 				elseif op == 1 then --[[ BREAK ]]
 					if breakHook then
 						local results = table.pack(breakHook(stack, debugging, proto, module, upvals))
-						
+
 						if results[1] then 
 							return table_unpack(results, 2, #results)
 						end 
 					end
-					
+
 					pc -= 1
 					op = debugopcodes[pc]
 					handlingBreak = true
@@ -830,15 +832,15 @@ local function luau_load(module, env, luau_settings)
 					local B = inst.B
 
 					local kv = inst.K
-					
+
 					local sb = stack[B]
 
 					stack[A + 1] = sb
-					
+
 					pc += 1 --// adjust for aux 
-					
+
 					local useFallback = true
-					
+
 					--// Special handling for native namecall behaviour
 					local useNativeHandler = luau_settings.useNativeNamecall
 
@@ -866,7 +868,7 @@ local function luau_load(module, env, luau_settings)
 
 						if ret_list[1] == true then
 							useFallback = false
-							
+
 							pc += 1 --// Skip next CALL instruction
 
 							inst = callInst
@@ -887,7 +889,7 @@ local function luau_load(module, env, luau_settings)
 							table_move(ret_list, 1, ret_num, callA, stack)
 						end
 					end
-					
+
 					if useFallback then
 						stack[A] = sb[kv]
 					end
@@ -1021,10 +1023,10 @@ local function luau_load(module, env, luau_settings)
 				elseif op == 49 then --[[ CONCAT ]]
 					local B, C = inst.B, inst.C
 					local success, s = pcall(table_concat, stack, "", B, C)
-	
+
 					if not success then
 						s = stack[B]
-	
+
 						for i = B + 1, C do
 							s ..= stack[i]
 						end
