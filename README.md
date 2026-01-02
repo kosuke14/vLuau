@@ -10,16 +10,22 @@ You can use this module instead of loadstring in roblox but with sandboxed bytec
 ```lua
 local loadstring = require(path.to.MainModule) -- requiring vLuau MainModule
 
-loadstring(<string:(source or bytecode)>[, table:env, string:chunkname]): function
+loadstring(<(source | bytecode):string>[, table:env, string:chunkname, luau_settings:table]): function
 -- compile code and build function
 loadstring.luau_execute(...)
 -- same as above
 
-loadstring.luau_compile(<string:source>[, string:chunkname]): string
+loadstring.luau_compile(<source:string>[, chunkname:string]): string
 -- compile code and return bytecode
 
-loadstring.luau_load(<string:bytecode>[, table:env]): function
+loadstring.luau_load(<bytecode:string>[, env:table, luau_settings:table]): function
 -- build function with provided compiled bytecode
+
+-- luau_settings can be generated with
+loadstring.create_settings()
+
+-- to create custom env
+loadstring.create_env(envwriter:table) -- envwriter should be table of additional globals
 
 -- Examples:
 loadstring("print('hello world!')", getfenv(0))()
@@ -27,7 +33,8 @@ loadstring("print('hello world!')", getfenv(0))()
 loadstring("a", nil, 'syntaxTest')()
 -- (ERROR) syntaxTest:1: Incomplete statement: expected assignment or a function call
 ```
-Roblox Model is available at [here](https://create.roblox.com/store/asset/108059886578663) (trolled rblx fr)
+Roblox Model is available at [here](https://create.roblox.com/store/asset/108059886578663) (trolled rblx fr)<br>
+For detailed informations about `luau_settings`: [Fiu](https://github.com/rce-incorporated/Fiu?tab=readme-ov-file#settings)
 ## Building
 1. Go [LuauCeption](https://github.com/RadiatedExodus/LuauCeption) and build them as compiler with latest Luau
 2. Replace Ception.luau with the built version.
@@ -37,6 +44,7 @@ Roblox Model is available at [here](https://create.roblox.com/store/asset/108059
 |   ├── <ModuleScript> Ception (Ception.luau)
 └── └── <ModuleScript> Fiu (Fiu.luau)
 ```
+> Building with Rojo is not recommended because Roblox doesn't allow to set very long script source via `Script.Source` method.
 ### Tips to add large 'ModuleScript' into Roblox Studio
 Roblox Studio could be crashed when you try to paste the large script into Roblox Studio.<br>
 This tips may solve that problem.
