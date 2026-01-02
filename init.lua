@@ -1,3 +1,4 @@
+--!nocheck
 --[[
 	vLuau - Similar to vLua but has Fully Luau Support (by gh:kosuke14)
 	vLuau is a Luau virtual machine written in Luau.
@@ -17,11 +18,31 @@
 local Loader = require(script:WaitForChild("Fiu"))
 local Ception = require(script:WaitForChild("Ception"))
 
+-- define default Fiu settings to run more natively on roblox
+local function createSettings()
+	return {
+		vectorCtor = Vector3 and Vector3.new or function() error("vectorCtor was not provided") end,
+		vectorSize = 3,
+		useNativeNamecall = false,
+		namecallHandler = function() error("Native __namecall handler was not provided") end,
+		extensions = {},
+		callHooks = {},
+		errorHandling = false,
+		generalizedIteration = false,
+		allowProxyErrors = false,
+		useImportConstants = false,
+		staticEnvironment = {},
+		decodeOp = function(op) return op end
+	}
+end
+
+local default_settings = createSettings()
+
 local function ValidLuauBytecode(bytecode)
 	if bytecode:len(bytecode) == 0 then
 		return false
 	end
-	
+
 	local bc = if typeof(bytecode) == 'string' then buffer.fromstring(bytecode) else bytecode
 	local luauVersion = buffer.readu8(bc, 0)
 	if luauVersion == 0 then
@@ -33,27 +54,27 @@ local function ValidLuauBytecode(bytecode)
 	elseif luauVersion >= 4 then
 		return true
 	end
-	
+
 	return true
 end
 function luau_compile(source, chunkname)
 	local bytecode, _ = Ception.luau_compile(source)
 	return bytecode:sub(1, 1) ~= "\0" and bytecode or error((chunkname or '@') .. bytecode:sub(2), 0) -- stack level is 0 to make debugging easier
 end
-function luau_load(bytecode, env)
+function luau_load(bytecode, env, settings)
 	assert(ValidLuauBytecode(bytecode), "luau_load: Argument #1 got invalid bytecode")
 	assert(type(env) == 'table' or env == nil, ("luau_load: Argument #2 got '%s' (table expected)"):format(typeof(env)))
-	return Loader.luau_load(bytecode, env or getfenv(debug.info(2, 'f')))
+	return Loader.luau_load(bytecode, env or getfenv(debug.info(2, 'f')), settings or default_settings)
 end
 
 return setmetatable({
 	luau_compile = luau_compile,
 	luau_load = luau_load,
-	luau_execute = function(source, env, chunkname)
+	luau_execute = function(source, env, chunkname, settings)
 		if ValidLuauBytecode(source) then
-			return luau_load(source, env)
+			return luau_load(source, env, settings)
 		end
-		return luau_load(luau_compile(source, chunkname), env or getfenv(debug.info(2, 'f')))
+		return luau_load(luau_compile(source, chunkname), env or getfenv(debug.info(2, 'f')), settings)
 	end,
 	create_env = function(envwriter)
 		local fenv = getfenv(debug.info(2, 'f'))
@@ -64,9 +85,9 @@ return setmetatable({
 		})
 		return env
 	end,
+	create_settings = createSettings
 }, {
 	__call = function(self, source, env, chunkname)
 		return self.luau_execute(source, env or getfenv(debug.info(2, 'f')), chunkname)
 	end,
 })
-
