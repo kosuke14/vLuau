@@ -5,7 +5,7 @@ You can use this module instead of loadstring in roblox but with sandboxed bytec
 ## Credits
 - [vLuau](https://github.com/kosuke14/vLuau) - [me (kosuke14)](https://github.com/kosuke14)
 - [Fiu](https://github.com/TheGreatSageEqualToHeaven/Fiu) (Luau Bytecode Interpreter) - [TheGreatSageEqualToHeaven](https://github.com/TheGreatSageEqualToHeaven) and [Rerumu](https://github.com/Rerumu)
-- [LuauCeption](https://github.com/RadiatedExodus/LuauCeption) (Running Luau inside Luau) - [RadiatedExodus](https://github.com/RadiatedExodus) and [phoria](https://github.com/phoria)
+- [LuauCeption](https://github.com/RadiatedExodus/LuauCeption) (Running Luau inside Luau) - [RadiatedExodus](https://github.com/RadiatedExodus), [phoriah](https://github.com/phoriah), and [jLn0n](https://github.com/jLn0n)
 ## Usage
 ```lua
 local loadstring = require(path.to.MainModule) -- requiring vLuau MainModule
