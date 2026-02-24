@@ -1,6 +1,6 @@
 # vLuau
 vLuau is a Luau VM with compiler which can be ran in Roblox.<br>
-Like vLua but with Fully Luau Support.<br>
+Like vLua but with Fully Luau Support. (native code generation and some optimizations are excepted)<br>
 You can use this module instead of loadstring in roblox but with sandboxed bytecode.
 ## Credits
 - [vLuau](https://github.com/kosuke14/vLuau) - [me (kosuke14)](https://github.com/kosuke14)
